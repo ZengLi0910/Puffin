@@ -43,15 +43,15 @@ contains
 
     logical, intent(inout) :: qOK
 
-    
+
     LOGICAL :: qOKL
 
     qOK = .false.
 
 !$OMP WORKSHARE
-    sdpr = sInv2rho * ( n2col * byu  & 
+    sdpr = sInv2rho * ( n2col * byu  &
                         - sEta_G * sp2 / sKappa_G**2 *    &
-                        sField4ElecReal ) & 
+                        sField4ElecReal ) &
            + sKappa_G * spi / sgam * (1 + sEta_G * sp2) &
                * n2col * bzu
 !$OMP END WORKSHARE
@@ -60,10 +60,10 @@ contains
 
     qOK = .true.
 
-    !goto 2000 
+    !goto 2000
 
     !1000 call Error_log('Error in equations:dppdz_r',tErrorLog_G)
-    
+
     !print*,'Error in equations:dppdz_r'
 
     !2000 continue
@@ -85,7 +85,7 @@ contains
 
 
     real(kind=wp), contiguous, intent(in) :: sx(:), sy(:), sz2(:), spr(:), &
-                                             spi(:), sgam(:) 
+                                             spi(:), sgam(:)
     real(kind=wp), intent(in) :: sZ
     real(kind=wp), contiguous, intent(out) :: sdpi(:)
 
@@ -93,15 +93,15 @@ contains
 
     logical, intent(inout) :: qOK
 
-    LOGICAL :: qOKL                   
+    LOGICAL :: qOKL
 
 
     qOK = .false.
 
 !$OMP WORKSHARE
-    sdpi = sInv2rho * (  n2col * bxu  & 
+    sdpi = sInv2rho * (  n2col * bxu  &
            - sEta_G * sp2 / sKappa_G**2 * &
-                        sField4ElecImag ) & 
+                        sField4ElecImag ) &
            - sKappa_G * spr / sgam * (1 + sEta_G * sp2) &
                * n2col * bzu
 !$OMP END WORKSHARE
@@ -110,12 +110,12 @@ contains
 
     qOK = .true.
 
-    !goto 2000 
+    !goto 2000
 
     !1000 call Error_log('Error in equations:dppdz_i',tErrorLog_G)
-    
+
     !print*,'Error in equations:dppdz_i'
-    
+
     !2000 continue
 
 
@@ -150,18 +150,21 @@ contains
 !$OMP WORKSHARE
 
     sdgam = -sRho_G * ( 1 + sEta_G * sp2 ) / sgam * 2_wp *   &
-           ( spr * sField4ElecReal + spi * sField4ElecImag ) 
+           ( spr * sField4ElecReal + spi * sField4ElecImag ) &
+           - (((2.0_WP/3.0_WP)*2.818E-15*((sgam*sGammaR_G)*(6.283_WP/lam_w_g)*saw_G)**2.0_WP)/sGammaR_G)
+
 
 !$OMP END WORKSHARE
-
+    !print *,sdgam
+    !print *,'I was called'
     ! Set the error flag and exit
 
     qOK = .true.
 
-    !goto 2000 
+    !goto 2000
 
     !1000 call Error_log('Error in equations:dp2dz',tErrorLog_G)
-    
+
     !print*,'Error in equations:dp2dz'
 
     !2000 continue
@@ -211,14 +214,14 @@ contains
 !$OMP END WORKSHARE
 
 !    sdx = spr * Lj / nd
-    
+
 
     qOK = .true.
-    
+
     !goto 2000
-    
+
     !1000 call Error_log('Error in equations:dxdz',tErrorLog_G)
-    
+
     !2000 continue
 
 
@@ -240,7 +243,7 @@ contains
 
     real(kind=wp), contiguous, intent(in) :: sx(:), sy(:), sz2(:), spr(:), &
                                              spi(:), sgam(:)
-    
+
     real(kind=wp), contiguous, intent(out) :: sdy(:)
 
     logical, intent(inout) :: qOK
@@ -265,11 +268,11 @@ contains
 
 
     qOK = .true.
-    
+
     !goto 2000
-    
+
     !1000 call Error_log('Error in equations:dydz',tErrorLog_G)
-    
+
     !2000 continue
 
 
@@ -312,15 +315,15 @@ contains
 !$OMP END WORKSHARE
 
     qOK = .true.
-    
+
     !goto 2000
-    
+
     !1000 call Error_log('Error in equations:dz2dz',tErrorLog_G)
-    
+
     !2000 continue
 
   end subroutine dz2dz_f
-  
+
 
 
 
@@ -332,7 +335,7 @@ contains
     implicit none
 
 ! Allocate the arrays used in the calculation of
-! the electron eqns  
+! the electron eqns
 
     integer(kind=ip), intent(in) :: ar_sz
 
@@ -350,7 +353,7 @@ contains
     implicit none
 
 ! Allocate the arrays used in the calculation of
-! the electron eqns  
+! the electron eqns
 
     deallocate(sp2, sField4ElecReal, &
              sField4ElecImag)! , Lj(ar_sz))
@@ -372,19 +375,19 @@ contains
           print*, 'undulator section not recognised, sz < 0!!'
           stop
 
-        else if (sZl <= sZFS) then 
+        else if (sZl <= sZFS) then
 
           iUndPlace_G = iUndStart_G
 
         else if (sZl >= sZFE) then
- 
+
           iUndPlace_G = iUndEnd_G
 
         else if ((sZl > sZFS) .and. (sZl < sZFE)) then
 
           iUndPlace_G = iUndMain_G
 
-        else 
+        else
 
           print*, 'undulator section not recognised, sz > sZFE!!'
           stop
@@ -405,4 +408,3 @@ contains
 
 
 end module equations
-
