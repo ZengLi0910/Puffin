@@ -139,26 +139,35 @@ contains
                                              spi(:), sgam(:)
 
     real(kind=wp), contiguous, intent(out) :: sdgam(:)
-
+    real(kind=wp) ran_nums(iNumberElectrons_G)
     logical, intent(inout) :: qOK
 
     LOGICAL :: qOKL
 
-
+    CALL RANDOM_NUMBER(ran_nums)
+    ran_nums=(2.0_WP*ran_nums)-1.0_WP
     qOK = .false.
 
 !$OMP WORKSHARE
 
     sdgam = -sRho_G * ( 1 + sEta_G * sp2 ) / sgam * 2_wp *   &
            ( spr * sField4ElecReal + spi * sField4ElecImag ) &
-           - (((2.0_WP/3.0_WP)*2.818E-15*((sgam*sGammaR_G)*(6.283_WP/lam_w_g)*saw_G)**2.0_WP)/sGammaR_G)
+           ! The recoil part - substracts energy from electrons
+           - (((2.0_WP/3.0_WP)*2.818E-15*((sgam*sGammaR_G)*(6.283_WP/lam_w_g)*saw_G)**2.0_WP)/sGammaR_G) &
+           ! Energy spread increase over the FEL length
+           + ((ran_nums)*(DSQRT((sgam*sGammaR_G)**4.0_WP*18.849_WP*(1.015E-27* &
+           ((6.283_WP/lam_w_g)*saw_G)**2.0_WP*((1.697_WP*saw_G) + &
+           1.0_WP/(1.0_WP+1.88_WP*saw_G+0.8_WP*saw_G**2.0_WP)))))/sGammaR_G)
 
 
 !$OMP END WORKSHARE
-    !print *,sdgam
-    !print *,'I was called'
+    print *,sdgam
+    ! print *, -(((2.0_WP/3.0_WP)*2.818E-15*((sgam*sGammaR_G)*(6.283_WP/lam_w_g)*saw_G)**2.0_WP)/sGammaR_G)
+    ! print *,'I was called'
     ! Set the error flag and exit
-
+    ! print *,- (((2.0_WP/3.0_WP)*2.818E-15*((sgam*sGammaR_G)*(6.283_WP/lam_w_g)*saw_G)**2.0_WP)/sGammaR_G)
+    ! print *,((ran_nums)*(DSQRT((sgam*sGammaR_G)**4_wp*18.849_wp*(1.015E-27*((6.283_WP/lam_w_g)*saw_G)**2_wp*((1.697_wp*saw_G) + &
+    ! 1_wp/(1_wp+1.88_wp*saw_G+0.8_wp*saw_G**2_wp)))))/sGammaR_G)
     qOK = .true.
 
     !goto 2000

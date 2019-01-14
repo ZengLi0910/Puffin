@@ -34,7 +34,7 @@ implicit none
   REAL(KIND=WP), DIMENSION(:), ALLOCATABLE :: dpxm, dpxt, pxt
   REAL(KIND=WP), DIMENSION(:), ALLOCATABLE :: dpym, dpyt, pyt
   REAL(KIND=WP), DIMENSION(:), ALLOCATABLE :: dz2m, dz2t, z2t
-  REAL(KIND=WP), DIMENSION(:), ALLOCATABLE :: dpz2m, dpz2t, pz2t  
+  REAL(KIND=WP), DIMENSION(:), ALLOCATABLE :: dpz2m, dpz2t, pz2t
 
 contains
 
@@ -43,10 +43,10 @@ subroutine rk4par(sZ,h,qD)
   implicit none
 !
 ! Perform 4th order Runge-Kutta integration, tailored
-! to Puffin and its method of parallelization: 
+! to Puffin and its method of parallelization:
 ! This is NOT a general, all-purpose RK4 routine, it
-! is specific to Puffin. Includes MPI_gathers and 
-! scatters etc between calculation of derivatives for 
+! is specific to Puffin. Includes MPI_gathers and
+! scatters etc between calculation of derivatives for
 ! use with the parallel field derivative.
 !
 !                ARGUMENTS
@@ -55,7 +55,7 @@ subroutine rk4par(sZ,h,qD)
 ! SA      INPUT/OUTPUT   Field values
 ! x       INPUT          Propagation distance zbar
 ! h       INPUT          Step size in zbar
-      
+
 !  REAL(KIND=WP),  DIMENSION(:), INTENT(INOUT) :: sA, A_local
   REAL(KIND=WP),  INTENT(IN)                  :: sZ
   REAL(KIND=WP),                INTENT(IN)  :: h
@@ -64,7 +64,7 @@ subroutine rk4par(sZ,h,qD)
 !               LOCAL ARGS
 !
 ! h6         Step size divided by 6
-! hh         Half of the step size 
+! hh         Half of the step size
 ! xh         x position incremented by half a step
 ! dym        Intermediate derivatives
 ! dyt        Intermediate derivatives
@@ -80,7 +80,7 @@ subroutine rk4par(sZ,h,qD)
 
 
   REAL(KIND=WP), DIMENSION(:),ALLOCATABLE :: dAdx
-  REAL(KIND=WP), DIMENSION(:),ALLOCATABLE :: A_localt 
+  REAL(KIND=WP), DIMENSION(:),ALLOCATABLE :: A_localt
   INTEGER(KIND=IP) :: error, trans
 
 !    Transverse nodes
@@ -89,7 +89,7 @@ subroutine rk4par(sZ,h,qD)
 
 !    Step sizes
 
-  hh = h * 0.5_WP    
+  hh = h * 0.5_WP
   h6 = h / 6.0_WP
   szh = sz + hh
 
@@ -152,7 +152,7 @@ subroutine rk4par(sZ,h,qD)
 !  allocate(DADx(2*local_rows))
 !  allocate(A_localt(2*local_rows))
 
-!    A_local from A_big	  
+!    A_local from A_big
 
   if (qD) then
 
@@ -171,7 +171,7 @@ subroutine rk4par(sZ,h,qD)
 !    First step
 !  iy = size(sElX_G)
 !  idydx = size(dxdx)
-  
+
 !    Get derivatives
 
   call derivs(sZ, A_localtr0, A_localti0, &
@@ -186,7 +186,7 @@ subroutine rk4par(sZ,h,qD)
   !print*, dpydx
 
 !    Increment local electron and field values
-  
+
   if (qPArrOK_G) then
 
 !$OMP PARALLEL WORKSHARE
@@ -201,7 +201,7 @@ subroutine rk4par(sZ,h,qD)
     A_localti1 = A_localti0 + hh * dadz_i0
 !$OMP END PARALLEL WORKSHARE
 
-!    Update large field array with new values 
+!    Update large field array with new values
 !  call local2globalA(A_localt,sA,recvs,displs,tTransInfo_G%qOneD)
 
     call upd8a(A_localtr1, A_localti1)
@@ -210,7 +210,7 @@ subroutine rk4par(sZ,h,qD)
 
 
 
-!    Second step       
+!    Second step
 !    Get derivatives
 
   if (qPArrOK_G) &
@@ -245,7 +245,7 @@ subroutine rk4par(sZ,h,qD)
 
   end if
 
-!    Third step       
+!    Third step
 !    Get derivatives
 
 
@@ -289,21 +289,21 @@ subroutine rk4par(sZ,h,qD)
 !$OMP END PARALLEL WORKSHARE
   end if
 
-!    Fourth step       
+!    Fourth step
 
   szh = sz + h
 
 
 !    Get derivatives
 
-  if (qPArrOK_G) & 
+  if (qPArrOK_G) &
       call derivs(szh, A_localtr3, A_localti3, &
        xt, yt, z2t, pxt, pyt, pz2t, &
        dxt, dyt, dz2t, dpxt, dpyt, dpz2t, &
-       dadz_r1, dadz_i1)  
+       dadz_r1, dadz_i1)
 
 
-!    Accumulate increments with proper weights       
+!    Accumulate increments with proper weights
 
   if (qPArrOK_G) then
 !$OMP PARALLEL WORKSHARE
@@ -349,14 +349,14 @@ subroutine rk4par(sZ,h,qD)
 !  deallocate(A_localtr2, A_localti2)
 !  deallocate(A_localtr3, A_localti3)
 !
-!  deallocate(DxDx)    
-!  deallocate(DyDx)    
-!  deallocate(DpxDx)    
-!  deallocate(DpyDx)    
-!  deallocate(Dz2Dx)    
-!  deallocate(Dpz2Dx)    
+!  deallocate(DxDx)
+!  deallocate(DyDx)
+!  deallocate(DpxDx)
+!  deallocate(DpyDx)
+!  deallocate(Dz2Dx)
+!  deallocate(Dpz2Dx)
 
-!   Set error flag and exit         
+!   Set error flag and exit
 
   GOTO 2000
 
@@ -380,12 +380,12 @@ subroutine allact_rk4_arrs()
 
   tllen43D = tllen * ntrndsi_G
 
-  allocate(DxDx(iNumberElectrons_G))    
-  allocate(DyDx(iNumberElectrons_G))    
-  allocate(DpxDx(iNumberElectrons_G))    
-  allocate(DpyDx(iNumberElectrons_G))    
-  allocate(Dz2Dx(iNumberElectrons_G))    
-  allocate(Dpz2Dx(iNumberElectrons_G))    
+  allocate(DxDx(iNumberElectrons_G))
+  allocate(DyDx(iNumberElectrons_G))
+  allocate(DpxDx(iNumberElectrons_G))
+  allocate(DpyDx(iNumberElectrons_G))
+  allocate(Dz2Dx(iNumberElectrons_G))
+  allocate(Dpz2Dx(iNumberElectrons_G))
 
 
   allocate(dadz_r0(tllen43D), dadz_i0(tllen43D))
@@ -438,15 +438,15 @@ subroutine deallact_rk4_arrs()
   deallocate(A_localtr2, A_localti2)
   deallocate(A_localtr3, A_localti3)
 
-  deallocate(DxDx)    
-  deallocate(DyDx)    
-  deallocate(DpxDx)    
-  deallocate(DpyDx)    
-  deallocate(Dz2Dx)    
-  deallocate(Dpz2Dx)    
+  deallocate(DxDx)
+  deallocate(DyDx)
+  deallocate(DpxDx)
+  deallocate(DpyDx)
+  deallocate(Dz2Dx)
+  deallocate(Dpz2Dx)
 
   deallocate(dxm, &
-    dxt, xt)    
+    dxt, xt)
   deallocate(dym, &
     dyt, yt)
   deallocate(dpxm, &
@@ -482,13 +482,13 @@ end subroutine deallact_rk4_arrs
 ! Scoop out preamble of rhs, defining temp vars.
 ! These can all be defined outside this routine to make
 ! it more readable
-! 
+!
 ! label consistently - *_g for main global,
 !                      *_rg for rhs global,
 !                      *_dg for diffraction global
 !
 ! Check 3D und eqns - are they general? i.e. can kx and ky be anything?
-! 
+!
 ! Lj, field4elec (real and imag) and dp2f should be global?
 !
 ! Interface for private var access??
@@ -503,7 +503,7 @@ end subroutine deallact_rk4_arrs
 ! Rename eqns to electron eqns or something...
 !
 ! Make rhs / eqns vars global
-! fix dp2f interface in rhs.f90 ... DONE 
+! fix dp2f interface in rhs.f90 ... DONE
 ! only allocate / calc dp2f when it will be used!
 !
 
