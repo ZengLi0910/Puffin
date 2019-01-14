@@ -197,6 +197,8 @@ end if
       igoes = 1_ip
       do
         call rk4par(sZl,sStepSize,qDiffrctd)
+        !sElGam_G = sElGam_G - &
+        !(((2.0_WP/3.0_WP)*2.818E-15*((sElGam_G*sGammaR_G)*(6.283_WP/lam_w_g)*saw_G)**2.0_WP)/sGammaR_G)/300.0_WP
         if (igoes>3_ip) exit
         if (.not. qPArrOK_G) then
           call deallact_rk4_arrs()

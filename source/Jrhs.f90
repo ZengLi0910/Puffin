@@ -308,13 +308,14 @@ contains
     if (.not. qElectronsEvolve_G) then
        sdpr = 0.0_wp
        sdpi = 0.0_wp
-       !sdgam = 0.0_wp
-       call dgamdz_f(sx, sy, sz2, spr, spi, sgam, &
-                    sdgam, qOKL)
-       sdgam = sdgam - (((2.0_WP/3.0_WP)*2.818E-15*((sgam*sGammaR_G)*(6.283_WP/lam_w_g)*saw_G)**2.0_WP)/sGammaR_G)
+       sdgam = 0.0_wp
+       !call dgamdz_f(sx, sy, sz2, spr, spi, sgam, &
+       !              sdgam, qOKL)
+       !sdgam = sdgam - (((2.0_WP/3.0_WP)*2.818E-15*((sgam*sGammaR_G)*(6.283_WP/lam_w_g)*saw_G)**2.0_WP)/sGammaR_G)
        sdx   = 0.0_wp
        sdy   = 0.0_wp
        sdz2 = 0.0_wp
+       !print *,sdgam
     end if
 
 !     Deallocate arrays
